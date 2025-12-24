@@ -2,9 +2,6 @@ import "./App.css";
 import { InfinitePeople } from "./people/InfinitePeople";
 import { InfiniteSpecies } from "./species/InfiniteSpecies";
 import {
-  useQuery,
-  useMutation,
-  useQueryClient,
   QueryClient,
   QueryClientProvider,
 } from '@tanstack/react-query';
