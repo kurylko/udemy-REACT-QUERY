@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 
 import { fetchPosts, deletePost, updatePost } from "./api";
 import { PostDetail } from "./PostDetail";
@@ -10,7 +10,17 @@ export function Posts() {
   const [selectedPost, setSelectedPost] = useState(null);
 
   const queryClient = useQueryClient();
+  // mutations are typically used to create/update/delete data or perform server side-effects.
+  // deleteMutation.mutate
+  const deleteMutation = useMutation({
+    mutationFn: (postId) => deletePost(postId),
+  });
+
+  const updateTitleMutation = useMutation({
+    mutationFn: (postId) => updatePost(postId),
+  });
   
+
 // Prefetching next page, data stored in cache
   useEffect(() => {
     if(currentPage < maxPostPage) {   
@@ -55,7 +65,11 @@ export function Posts() {
           <li
             key={post.id}
             className="post-title"
-            onClick={() => setSelectedPost(post)}
+            onClick={() => {
+              deleteMutation.reset(); // reset mutation state(status) when selecting a new post
+              updateTitleMutation.reset();
+              setSelectedPost(post);
+            }}
           >
             {post.title}
           </li>
@@ -75,7 +89,12 @@ export function Posts() {
         </button>
       </div>
       <hr />
-      {selectedPost && <PostDetail post={selectedPost} />}
+      {selectedPost 
+      && <PostDetail 
+      post={selectedPost} 
+      deleteMutation={deleteMutation}
+      updateTitleMutation={updateTitleMutation}
+       />}
     </>
   );
 }
