@@ -12,6 +12,7 @@ export function Posts() {
   const { data, isError, error, isLoading } = useQuery({
     queryKey: ["posts"], //key is always an array
     queryFn: fetchPosts, // function that returns a promise to fetch a data
+    // passing the function by reference, no args, no params
     staleTime: 2000, // data considered fresh for 2 seconds - then needs to be refetched
   });
 

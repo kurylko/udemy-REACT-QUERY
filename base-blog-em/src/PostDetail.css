@@ -1,5 +1,5 @@
 .title {
-  color: blue;
+  color: magenta;
 }
 
 .error {
@@ -14,4 +14,14 @@
 
 .success {
   color: green;
+}
+
+.comment {
+  display: flex;
+  gap: 8px;
+}
+
+.commenter {
+  font-style: italic;
+  color: magenta;
 }
