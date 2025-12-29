@@ -15,6 +15,11 @@ export function useTreatments(): Treatment[] {
   const { data } = useQuery({
     queryKey: [queryKeys.treatments],
     queryFn: getTreatments,
+    // staleTime: 60000, // 10 minutes - for refreshing data after this time (data remains fresh for this time)
+    // gcTime: 90000,   // 15 minutes - for removing data from cache after this time (garbage collection time)
+    // refetchOnMount: false, // do not refetch data when component remounts
+    // refetchOnWindowFocus: false, // do not refetch data when window regains focus (new tab)
+    // refetchOnReconnect: false, // do not refetch data when reconnecting to internet
   }); 
     return data || [];
 }
@@ -25,5 +30,7 @@ export function usePrefetchTreatments(): void {
   queryClient.prefetchQuery({
     queryKey: [queryKeys.treatments], // data in a cache is identified by its queryKey
     queryFn: getTreatments,
+    // staleTime: 60000, // 10 minutes - for refreshing data after this time (data remains fresh for this time)
+    // gcTime: 90000,
   });
 }

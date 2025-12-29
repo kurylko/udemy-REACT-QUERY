@@ -10,6 +10,7 @@ import { axiosInstance } from "@/axiosInstance";
 import { queryKeys } from "@/react-query/constants";
 import { App } from "@/components/app/App";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { s } from "vitest/dist/reporters-O4LBziQ_";
 
 // for useQuery call
 async function getAppointments(
@@ -19,6 +20,10 @@ async function getAppointments(
   const { data } = await axiosInstance.get(`/appointments/${year}/${month}`);
   return data;
 }
+  const commonOptions = {
+    staleTime: 0, // 5 minutes - for refreshing data after this time (data remains fresh for this time)
+    gcTime: 300000,   // 5 minutes - for removing data from cache after this time (garbage collection time)
+  };
 
 // The purpose of this hook:
 //   1. track the current month/year (aka monthYear) selected by the user
@@ -57,10 +62,11 @@ export function useAppointments() {
 
     return getAvailableAppointments(data, userId);
   }, [userId, showAll]); 
-  
+
   /** ****************** END 2: filter appointments  ******************** */
   /** ****************** START 3: useQuery  ***************************** */
   // useQuery call for appointments for the current monthYear
+
 const queryClient = useQueryClient();
 
 useEffect(() => {
@@ -69,11 +75,13 @@ useEffect(() => {
 
   queryClient.prefetchQuery({
     queryKey: [queryKeys.appointments, prevMonthYear.year, prevMonthYear.month],
-    queryFn: () => getAppointments(prevMonthYear.year, prevMonthYear.month),    
+    queryFn: () => getAppointments(prevMonthYear.year, prevMonthYear.month),   
+    ...commonOptions 
   });
   queryClient.prefetchQuery({
     queryKey: [queryKeys.appointments, nextMonthYear.year, nextMonthYear.month],
     queryFn: () => getAppointments(nextMonthYear.year, nextMonthYear.month),    
+    ... commonOptions
   });
 }, [monthYear, queryClient]); //prefetch when monthYear changes
 
@@ -84,6 +92,10 @@ useEffect(() => {
     queryFn: () => getAppointments(monthYear.year, monthYear.month),
     // keepPreviousData: true, // optional
     select: (data) => selectFn(data, showAll), // always runs
+    staleTime: 0, // 5 minutes - for refreshing data after this time (data remains fresh for this time)
+    gcTime: 300000,   // 5 minutes - for removing data from cache after this time (garbage collection time)
+    refetchOnWindowFocus: true, // do not refetch data when window regains focus (new tab) 
+    ...commonOptions
   });
 
   // Notes:
