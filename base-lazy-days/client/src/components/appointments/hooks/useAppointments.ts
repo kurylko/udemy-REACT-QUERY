@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 import { AppointmentDateMap } from "../types";
 import { getAvailableAppointments } from "../utils";
@@ -52,6 +52,12 @@ export function useAppointments() {
   //   appointments that the logged-in user has reserved (in white)
   const { userId } = useLoginData();
 
+  const selectFn = useCallback((data: AppointmentDateMap, showAll: boolean) => { //memoized with useCallback
+    if(showAll) return data;
+
+    return getAvailableAppointments(data, userId);
+  }, [userId, showAll]); 
+  
   /** ****************** END 2: filter appointments  ******************** */
   /** ****************** START 3: useQuery  ***************************** */
   // useQuery call for appointments for the current monthYear
@@ -60,7 +66,7 @@ const queryClient = useQueryClient();
 useEffect(() => {
   const prevMonthYear = getNewMonthYear(monthYear, -1);
   const nextMonthYear = getNewMonthYear(monthYear, 1);
-  
+
   queryClient.prefetchQuery({
     queryKey: [queryKeys.appointments, prevMonthYear.year, prevMonthYear.month],
     queryFn: () => getAppointments(prevMonthYear.year, prevMonthYear.month),    
@@ -77,6 +83,7 @@ useEffect(() => {
     queryKey: [queryKeys.appointments, monthYear.year, monthYear.month],
     queryFn: () => getAppointments(monthYear.year, monthYear.month),
     // keepPreviousData: true, // optional
+    select: (data) => selectFn(data, showAll), // always runs
   });
 
   // Notes:
