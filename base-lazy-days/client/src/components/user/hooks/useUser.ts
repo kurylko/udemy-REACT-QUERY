@@ -7,7 +7,7 @@ import type { User } from "@shared/types";
 import { useLoginData } from "@/auth/AuthContext";
 
 import { queryKeys } from "@/react-query/constants";
-import { generateUserKey } from "@/react-query/key-factories";
+import { generateUserAppointmentsKey, generateUserKey } from "@/react-query/key-factories";
 
 
 // query function
@@ -47,9 +47,18 @@ export function useUser() {
   function clearUser() {
     // resetting the user to null in query cache - in log out scenario
     if (userId && userToken) {
-      const userKey = [generateUserKey(userId, userToken)];
-      queryClient.removeQueries({ queryKey: userKey });
-      queryClient.setQueryData(userKey, null);
+      const userKey = generateUserKey(userId, userToken);
+    // clearing user data and appointments from cache
+      queryClient.removeQueries({ 
+        queryKey: userKey,
+       exact: true,
+       });
+      queryClient.removeQueries({ 
+        queryKey: generateUserAppointmentsKey(userId, userToken),
+         exact: true,
+       });
+     
+     // queryClient.setQueryData(userKey, null);
     }
   };
 
