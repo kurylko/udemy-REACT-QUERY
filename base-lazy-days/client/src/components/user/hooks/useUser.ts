@@ -1,35 +1,60 @@
 import { AxiosResponse } from "axios";
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { axiosInstance, getJWTHeader } from "@/axiosInstance";
 
 import type { User } from "@shared/types";
 
 import { useLoginData } from "@/auth/AuthContext";
-import { axiosInstance, getJWTHeader } from "@/axiosInstance";
+
 import { queryKeys } from "@/react-query/constants";
+import { generateUserKey } from "@/react-query/key-factories";
+
 
 // query function
-// async function getUser(userId: number, userToken: string) {
-//   const { data }: AxiosResponse<{ user: User }> = await axiosInstance.get(
-//     `/user/${userId}`,
-//     {
-//       headers: getJWTHeader(userToken),
-//     }
-//   );
+async function getUser(userId: number, userToken: string) {
+  const { data }: AxiosResponse<{ user: User }> = await axiosInstance.get(
+    `/user/${userId}`,
+    {
+      headers: getJWTHeader(userToken),
+    }
+  );
 
-//   return data.user;
-// }
+  return data.user;
+};
 
 export function useUser() {
-  // TODO: call useQuery to update user data from server
-  const user: User = null;
+  const queryClient = useQueryClient();
+  const { userId, userToken } = useLoginData();
 
-  // meant to be called from useAuth
+  // Always call useQuery, but disable it if missing userId/userToken
+  const { data: user } = useQuery({
+    queryKey: userId && userToken ? [generateUserKey(userId, userToken)] : ['user', 'disabled'],
+    queryFn: () => (userId && userToken ? getUser(userId, userToken) : Promise.resolve(null)),
+    enabled: !!userId && !!userToken,
+    staleTime: Infinity,
+  });
+
   function updateUser(newUser: User): void {
-    // TODO: update the user in the query cache
-  }
+    // updating the user in the query cache
+    if (userId && userToken) {
+      queryClient.setQueryData(
+        [generateUserKey(userId, userToken)], 
+        newUser
+      );
+    }
+  };
 
-  // meant to be called from useAuth
   function clearUser() {
-    // TODO: reset user to null in query cache
+    // resetting the user to null in query cache - in log out scenario
+    if (userId && userToken) {
+      const userKey = [generateUserKey(userId, userToken)];
+      queryClient.removeQueries({ queryKey: userKey });
+      queryClient.setQueryData(userKey, null);
+    }
+  };
+
+  if (!userId || !userToken) {
+    return { user: null, updateUser, clearUser };
   }
 
   return { user, updateUser, clearUser };

@@ -22,9 +22,9 @@ export const queryClient = new QueryClient({
     queries: {
       retry: 2, // number of retry attempts if query fails  
       retryDelay: 1000, // delay between retry attempts in milliseconds
-      staleTime: 300000, // 5 minutes - for refreshing data after this time (data remains fresh for this time)
-      gcTime: 600000,   // 10 minutes - for removing data from cache after this time (garbage collection time)
-      refetchOnWindowFocus: false, // do not refetch data when window regains focus (new tab)
+      staleTime: 300000, // 5 minutes - refreshing data after this time (data remains fresh for this time)
+      gcTime: 600000,   // 10 minutes - removing data from cache after this time (garbage collection time)
+      refetchOnWindowFocus: false, // do not refetch data when window regains focus (user goes to new tab)
     },
   },
     queryCache: new QueryCache({

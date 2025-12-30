@@ -95,6 +95,7 @@ useEffect(() => {
     staleTime: 0, // 5 minutes - for refreshing data after this time (data remains fresh for this time)
     gcTime: 300000,   // 5 minutes - for removing data from cache after this time (garbage collection time)
     refetchOnWindowFocus: true, // do not refetch data when window regains focus (new tab) 
+    refetchInterval: 60000, // refetch data every minute
     ...commonOptions
   });
 
