@@ -28,7 +28,7 @@ export function useUser() {
 
   // Always call useQuery, but disable it if missing userId/userToken
   const { data: user } = useQuery({
-    queryKey: userId && userToken ? [generateUserKey(userId, userToken)] : ['user', 'disabled'],
+    queryKey: userId && userToken ? [generateUserKey(userId)] : ['user', 'disabled'],
     queryFn: () => (userId && userToken ? getUser(userId, userToken) : Promise.resolve(null)),
     enabled: !!userId && !!userToken,
     staleTime: Infinity,
@@ -38,7 +38,7 @@ export function useUser() {
     // updating the user in the query cache
     if (userId && userToken) {
       queryClient.setQueryData(
-        [generateUserKey(userId, userToken)], 
+        [generateUserKey(userId)], 
         newUser
       );
     }
@@ -47,7 +47,7 @@ export function useUser() {
   function clearUser() {
     // resetting the user to null in query cache - in log out scenario
     if (userId && userToken) {
-      const userKey = generateUserKey(userId, userToken);
+      const userKey = generateUserKey(userId);
     // clearing user data and appointments from cache
       queryClient.removeQueries({ 
         queryKey: userKey,

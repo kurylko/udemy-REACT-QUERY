@@ -1,5 +1,5 @@
 import { toast } from "@/components/app/toast";
-import { QueryCache, QueryClient } from "@tanstack/react-query";
+import { MutationCache, QueryCache, QueryClient } from "@tanstack/react-query";
 
 function createTitle(
   errorMsg: string | undefined,
@@ -34,7 +34,15 @@ export const queryClient = new QueryClient({
   },
     queryCache: new QueryCache({
     onError: (error: unknown) => {
-     errorHandler((error as Error).message);
+      const title = createTitle(error instanceof Error ? error.message : undefined, 'query');
+     errorHandler(title);
+    }
+    }),
+
+    mutationCache: new MutationCache({
+    onError: (error: unknown) => {
+      const title = createTitle(error instanceof Error ? error.message : undefined, 'mutation');
+     errorHandler(title);
     }
     }),
 });

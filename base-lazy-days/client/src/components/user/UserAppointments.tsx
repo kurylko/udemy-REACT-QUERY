@@ -44,9 +44,9 @@ function AppointmentsTable({ userAppointments }: AppointmentsTableProps) {
             <Td>
               <IconButton
                 aria-label="cancel appointment"
-                onClick={() => {
-                  cancelAppointment(appointment);
-                }}
+                  onClick={() => {
+                    cancelAppointment.mutate(appointment); // run the mutation function
+                  }}
                 icon={<ImCancelCircle />}
               />
             </Td>

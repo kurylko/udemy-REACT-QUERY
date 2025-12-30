@@ -37,7 +37,7 @@ export function Appointment({ appointmentData }: AppointmentProps) {
   // turn the lozenge into a button if it's clickable
   if (clickable) {
     onAppointmentClick = userId
-      ? () => reserveAppointment(appointmentData)
+      ? () => reserveAppointment.mutate(appointmentData) // run the mutation function
       : undefined;
     hoverCss = {
       transform: "translateY(-1px)",
